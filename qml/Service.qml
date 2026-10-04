@@ -548,7 +548,10 @@ Item {
         if (!root.shell)
             return;
         root.lockService = root.shell.serviceFor("agx.lock");
-        root.idleService = root.shell.serviceFor("agx.idle");
+        // The host idle service is optional: keep it only when it carries
+        // the screensaver signals, so the Connections below stay quiet.
+        var idle = root.shell.serviceFor("agx.idle");
+        root.idleService = idle && ("screensaverStartedThisCycle" in idle || "screensaverWindowCount" in idle) ? idle : null;
         if (root.lockService) {
             root.setSessionLocked(root.lockService.locked);
             // Event-driven source wins once reachable; stop the fallback
